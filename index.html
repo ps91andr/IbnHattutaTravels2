@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ابن حتوتة | رحّالة حول العالم</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
+        
+        :root {
+            --primary: #ff7e31; /* Vibrant Orange */
+            --dark-bg: #0a192f;
+            --light-bg: #f8f9fa;
+            --card-bg: #112240;
+            --text-light: #ccd6f6;
+            --text-dark: #343a40;
+            --text-muted: #8892b0;
+            --facebook-blue: #1877F2;
+            --font-family: 'Tajawal', sans-serif;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: var(--font-family);
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* --- Preloader --- */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--dark-bg);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease;
+        }
+        #preloader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--card-bg);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* --- Navbar --- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 0;
+            z-index: 1000;
+            transition: all 0.3s ease-in-out;
+        }
+        .navbar.scrolled {
+            background-color: rgba(17, 34, 64, 0.85);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            padding: 15px 0;
+        }
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+        }
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        .nav-links li { margin-right: 35px; }
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+        }
+        .nav-links a:hover { color: var(--primary); }
+        .nav-links a:hover::after { width: 100%; }
+        
+        .mobile-menu-btn { display: none; }
+
+        /* --- Hero Section --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            /* --- التغيير هنا --- */
+            background: url('https://i.ibb.co/4nmCDvdt/Untitled.png') no-repeat center center/cover;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 25, 47, 0.6); /* فلتر داكن لجعل النص مقروءاً */
+            z-index: 1; /* تم تغيير Z-index */
+        }
+        .hero-content {
+            z-index: 2; /* تأكد من أن المحتوى فوق الفلتر */
+            transform: translateY(30px);
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards 0.5s;
+        }
+        .hero h1 {
+            font-size: 5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+        }
+        .typing-container {
+            font-size: 2rem;
+            font-weight: 500;
+            color: var(--primary);
+            margin-bottom: 2rem;
+            height: 40px;
+        }
+        .typing-cursor {
+            display: inline-block;
+            width: 3px;
+            height: 35px;
+            background-color: var(--primary);
+            animation: blink 0.7s infinite;
+        }
+        .hero .description {
+            font-size: 1.2rem;
+            max-width: 650px;
+            margin: 0 auto 3rem auto;
+            color: var(--text-light);
+        }
+        .cta-button {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(255, 126, 49, 0.4);
+        }
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(255, 126, 49, 0.5);
+        }
+
+        /* --- Section Styling & Dividers --- */
+        .section {
+            padding: 100px 0;
+            position: relative;
+        }
+        .section-light {
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+        }
+        .section-divider {
+            position: absolute;
+            top: -1px;
+            left: 0;
+            width: 100%;
+            overflow: hidden;
+            line-height: 0;
+            transform: rotate(180deg);
+        }
+        .section-divider svg {
+            position: relative;
+            display: block;
+            width: calc(100% + 1.3px);
+            height: 120px;
+        }
+        .section-divider .shape-fill { fill: var(--dark-bg); }
+        .section-title {
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 60px;
+            position: relative;
+        }
+        .section-light .section-title { color: var(--dark-bg); }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background-color: var(--primary);
+            border-radius: 5px;
+        }
+        
+        /* --- About Section --- */
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            gap: 60px;
+        }
+        .about-text p, .about-text blockquote {
+            font-size: 1.1rem;
+            line-height: 1.9;
+            margin-bottom: 25px;
+            color: var(--text-dark);
+        }
+        .about-text blockquote {
+            border-right: 4px solid var(--primary);
+            padding-right: 20px;
+            font-style: italic;
+            color: #555;
+        }
+        .highlight { color: var(--primary); font-weight: 700; }
+        .about-image {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+        .about-image:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 30px 60px -10px rgba(0, 0, 0, 0.3);
+        }
+        .about-image img { width: 100%; display: block; }
+        
+        .achievements {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 80px;
+        }
+        .achievement-card {
+            background: white;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid #eee;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        .achievement-card:hover { transform: translateY(-10px); }
+        .achievement-card::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(transparent, var(--primary), transparent 30%);
+            animation: rotate 4s linear infinite;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .achievement-card:hover::before { opacity: 1; }
+        .achievement-card-content {
+            position: relative;
+            background: white;
+            border-radius: 14px;
+            padding: 25px;
+            z-index: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .achievement-icon { font-size: 2.5rem; color: var(--primary); margin-bottom: 15px; }
+        .achievement-title { font-size: 1.3rem; margin-bottom: 10px; color: var(--text-dark); font-weight: 700; }
+        .achievement-desc { font-size: 1rem; line-height: 1.6; }
+
+        /* --- Journey Stats --- */
+        #journey {
+            padding-bottom: 150px;
+        }
+        .journey-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+            text-align: center;
+        }
+        .stat-number-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: baseline;
+            line-height: 1;
+        }
+        .stat-prefix {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-left: 8px;
+        }
+        .stat-number {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--primary);
+        }
+        .stat-label {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-top: 10px;
+        }
+
+        /* --- Community Section --- */
+        #community {
+            background: linear-gradient(rgba(10, 25, 47, 0.8), rgba(10, 25, 47, 0.8)), url('https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80') no-repeat center center/cover;
+            background-attachment: fixed;
+            text-align: center;
+        }
+        #community .section-title { color: white; }
+        #community .community-text {
+            max-width: 700px;
+            margin: -20px auto 40px;
+            font-size: 1.2rem;
+            line-height: 1.8;
+        }
+        .cta-button.facebook-btn {
+            background-color: var(--facebook-blue);
+            box-shadow: 0 4px 20px rgba(24, 119, 242, 0.4);
+        }
+        .cta-button.facebook-btn:hover {
+             box-shadow: 0 8px 30px rgba(24, 119, 242, 0.5);
+        }
+
+        /* --- Social & Footer --- */
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 60px;
+        }
+        .social-link {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--card-bg);
+            color: var(--text-light);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .social-link:hover {
+            color: white;
+            background-color: var(--primary);
+            transform: translateY(-5px);
+        }
+
+        footer {
+            padding: 60px 20px 30px;
+            background-color: var(--card-bg);
+            text-align: center;
+        }
+        .copyright {
+            margin-top: 30px;
+            color: var(--text-muted);
+        }
+
+        /* --- Animations --- */
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes blink { 50% { opacity: 0; } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 992px) {
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: 0;
+                width: 300px;
+                height: 100vh;
+                background-color: var(--card-bg);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                transform: translateX(100%);
+                transition: transform 0.3s ease-in-out;
+            }
+            .nav-links.active { transform: translateX(0); }
+            .nav-links li { margin: 20px 0; }
+            .mobile-menu-btn {
+                display: block;
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.8rem;
+                cursor: pointer;
+                z-index: 1001;
+            }
+            .about-content { grid-template-columns: 1fr; }
+            .about-image { order: -1; margin-bottom: 40px; }
+        }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 3.5rem; }
+            .typing-container { font-size: 1.5rem; }
+            .section-title { font-size: 2.5rem; }
+        }
+
+    </style>
+</head>
+<body>
+    
+    <div id="preloader">
+        <div class="loader"></div>
+    </div>
+    
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="#" class="logo">Ibn Hattuta</a>
+            <ul class="nav-links">
+                <li><a href="#about">عني</a></li>
+                <li><a href="#journey">رحلتي</a></li>
+                <li><a href="#social">التواصل</a></li>
+            </ul>
+            <button class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
+        </div>
+    </nav>
+    
+    <header class="hero">
+        <!-- تم حذف وسم الفيديو من هنا -->
+        <div class="hero-content">
+            <h1 id="typewriter"></h1><span class="typing-cursor"></span>
+            <div class="typing-container">مشرد حول العالم منذ 2015</div>
+            <p class="description">
+                نسافر لنستعيد الأمل الذي فقدناه، الأمل بالإنسان. نسافر لنكون أقرب من الشعوب، أقرب من الحقيقة، وأقرب لنا نحن.
+            </p>
+            <a href="https://www.ibnhattuta.com/" target="_blank" class="cta-button">اكتشف المزيد</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="section section-light" id="about">
+            <div class="section-divider">
+                <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                    <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" class="shape-fill"></path>
+                </svg>
+            </div>
+            <div class="container">
+                <h2 class="section-title">عن الرحّالة</h2>
+                <div class="about-content">
+                    <div class="about-text fade-in-up">
+                        <blockquote>مرحباً، أنا قاسم الحتو. أهلاً بكم في مدونة ترحالي. بدأت رحلتي حول العالم سنة ٢٠١٧ تقريباً، بهدف التعرف على الشعوب والثقافات المختلفة، ووجدت طرقاً للسفر بأقل التكاليف وشاركتها معكم.</blockquote>
+                        <p><span class="highlight">ليس مجرد مسافر عادي.</span> قاسم (ابن حتوتة)، الأردني الفلسطيني، صاحب رؤية حوّل حب الترحال إلى فن. زار أكثر من <span class="highlight">100 دولة</span>، وكل خطوة له كانت لمسة فرشاة على لوحة كوكبنا.</p>
+                        <p>أسلوبه المميز في رواية القصص جذب ملايين الشغوفين باستكشاف العالم. مدونة ابن حتوتة ليست مجرد محتوى، بل هي دعوة لمغامرة تفتح في كل خطوة أفقاً جديداً.</p>
+                    </div>
+                    <div class="about-image fade-in-up">
+                        <!-- تم تغيير رابط الصورة هنا -->
+                        <img src="https://i.ibb.co/W8bCwFz/brav.png" alt="صورة ابن حتوتة">
+                    </div>
+                </div>
+                <div class="achievements">
+                    <div class="achievement-card fade-in-up">
+                        <div class="achievement-card-content">
+                            <div class="achievement-icon"><i class="fas fa-trophy"></i></div>
+                            <h3 class="achievement-title">فوربس 30 تحت 30</h3>
+                            <p class="achievement-desc">تم اختياره كواحد من أهم 30 شخصية تحت سن الـ 30 على مجلة فوربس العالمية لسنة 2024.</p>
+                        </div>
+                    </div>
+                    <div class="achievement-card fade-in-up">
+                        <div class="achievement-card-content">
+                            <div class="achievement-icon"><i class="fas fa-film"></i></div>
+                            <h3 class="achievement-title">برنامج سديم</h3>
+                            <p class="achievement-desc">وصل إلى نصف نهائي برنامج سديم الشهير.</p>
+                        </div>
+                    </div>
+                    <div class="achievement-card fade-in-up">
+                        <div class="achievement-card-content">
+                            <div class="achievement-icon"><i class="fas fa-graduation-cap"></i></div>
+                            <h3 class="achievement-title">التفوق الأكاديمي</h3>
+                            <p class="achievement-desc">تخرج الأول على دفعته في علوم الحاسوب بالجامعة الألمانية الأردنية.</p>
+                        </div>
+                    </div>
+                    <div class="achievement-card fade-in-up">
+                        <div class="achievement-card-content">
+                            <div class="achievement-icon"><i class="fas fa-users"></i></div>
+                            <h3 class="achievement-title">بصمة رقمية</h3>
+                            <p class="achievement-desc">تأثير واسع في أنحاء الوطن العربي، مع ملايين المتابعين والمشاهدات.</p>
+                        </div>
+                    </div>
+                    <div class="achievement-card fade-in-up">
+                        <div class="achievement-card-content">
+                            <div class="achievement-icon"><i class="fas fa-globe-africa"></i></div>
+                            <h3 class="achievement-title">الهدف العالمي</h3>
+                            <p class="achievement-desc">يسعى لتصوير فيديو من كل دولة في العالم، وقد أنجز أكثر من نصف المهمة.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="journey">
+            <div class="container">
+                <h2 class="section-title">إحصائيات الرحلة</h2>
+                <div class="journey-stats">
+                    <div class="stat-item fade-in-up">
+                        <div class="stat-number-wrapper">
+                            <span class="stat-prefix">أكثر من</span>
+                            <span class="stat-number" data-target="3.05">0</span>
+                        </div>
+                        <div class="stat-label">مليون مشترك</div>
+                    </div>
+                    <div class="stat-item fade-in-up">
+                        <div class="stat-number-wrapper">
+                             <span class="stat-prefix">أكثر من</span>
+                            <span class="stat-number" data-target="384">0</span>
+                        </div>
+                        <div class="stat-label">مليون مشاهدة</div>
+                    </div>
+                    <div class="stat-item fade-in-up">
+                        <div class="stat-number-wrapper">
+                             <span class="stat-prefix">أكثر من</span>
+                            <span class="stat-number" data-target="390">0</span>
+                        </div>
+                        <div class="stat-label">فيديو</div>
+                    </div>
+                     <div class="stat-item fade-in-up">
+                        <div class="stat-number-wrapper">
+                             <span class="stat-prefix">أكثر من</span>
+                            <span class="stat-number" data-target="100">0</span>
+                        </div>
+                        <div class="stat-label">دولة</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="section" id="community">
+            <div class="container">
+                <h2 class="section-title fade-in-up">انضم إلى مجتمعنا</h2>
+                <p class="community-text fade-in-up">
+                    أسست مجتمع صغير للرحالة العرب على فيسبوك، "مجموعة مسافرون بلا حدود". إذا كانت لديك تجربة سفر تود مشاركتها أو ترغب في استلهام أفكار لرحلتك القادمة، فهذا هو مكانك.
+                </p>
+                <a href="https://www.facebook.com/groups/travelerswithoutborders" target="_blank" class="cta-button facebook-btn fade-in-up">
+                    <i class="fab fa-facebook-f" style="margin-left: 10px;"></i>
+                    انضم إلى المجموعة
+                </a>
+            </div>
+        </section>
+
+        <section class="section" id="social">
+             <div class="container">
+                <h2 class="section-title">تابع المغامرة</h2>
+                 <div class="social-links">
+                    <a href="https://www.youtube.com/@IBNHATTUTA" target="_blank" class="social-link fade-in-up"><i class="fab fa-youtube"></i></a>
+                    <a href="https://www.instagram.com/ibnhattuta" target="_blank" class="social-link fade-in-up"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.facebook.com/ibnhattuta" target="_blank" class="social-link fade-in-up"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.tiktok.com/@ibnhattuta" target="_blank" class="social-link fade-in-up"><i class="fab fa-tiktok"></i></a>
+                    <a href="https://twitter.com/ibnhattuta" target="_blank" class="social-link fade-in-up"><i class="fab fa-twitter"></i></a>
+                    <a href="https://story.snapchat.com/p/44eeea7e-1982-4994-88d5-878656ff7aac/1822089331902464" target="_blank" class="social-link fade-in-up"><i class="fab fa-snapchat"></i></a>
+                 </div>
+             </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <a href="#" class="logo">Ibn Hattuta Travels</a>
+            <p style="margin: 20px 0; color: var(--text-muted);">للتواصل التجاري: info@ibnhattuta.com</p>
+            <div class="copyright">
+                © 2024 Ibn Hattuta Travels. جميع الحقوق محفوظة.
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // --- Preloader ---
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            preloader.classList.add('hidden');
+        });
+
+        // --- Navbar Scroll Effect ---
+        const navbar = document.querySelector('.navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // --- Mobile Menu ---
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const navLinks = document.querySelector('.nav-links');
+        const navLinksItems = document.querySelectorAll('.nav-links a');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            const icon = mobileMenuBtn.querySelector('i');
+            icon.classList.toggle('fa-bars');
+            icon.classList.toggle('fa-times');
+        });
+
+        navLinksItems.forEach(link => {
+            link.addEventListener('click', () => {
+                if (navLinks.classList.contains('active')) {
+                    navLinks.classList.remove('active');
+                    mobileMenuBtn.querySelector('i').classList.remove('fa-times');
+                    mobileMenuBtn.querySelector('i').classList.add('fa-bars');
+                }
+            });
+        });
+
+        // --- Typewriter Effect ---
+        const typewriterElement = document.getElementById('typewriter');
+        const textToType = "ابن حتوتة";
+        let index = 0;
+        function type() {
+            if (index < textToType.length) {
+                typewriterElement.innerHTML += textToType.charAt(index);
+                index++;
+                setTimeout(type, 150);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', type);
+
+        // --- Intersection Observer for Animations ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.fade-in-up').forEach(el => {
+            observer.observe(el);
+        });
+
+        // --- Counter Animation ---
+        const statsObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const counters = entry.target.querySelectorAll('.stat-number');
+                    counters.forEach(counter => {
+                        const target = +counter.getAttribute('data-target');
+                        const duration = 2000;
+                        const frameRate = 60;
+                        const totalFrames = Math.round((duration / 1000) * frameRate);
+                        const increment = target / totalFrames;
+                        let current = 0;
+
+                        const timer = setInterval(() => {
+                            current += increment;
+                            if (current >= target) {
+                                clearInterval(timer);
+                                current = target;
+                            }
+                            
+                            if (target % 1 !== 0) { // Handle floats
+                                counter.innerText = current.toFixed(2);
+                            } else { // Handle integers
+                                counter.innerText = Math.floor(current).toLocaleString();
+                            }
+                        }, duration / totalFrames);
+                    });
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+        
+        statsObserver.observe(document.querySelector('.journey-stats'));
+    </script>
+</body>
+</html>
